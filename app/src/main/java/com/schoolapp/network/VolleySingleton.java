@@ -6,7 +6,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 public class VolleySingleton {
-    private static VolleySingleton instance;
+
+    private static VolleySingleton inst;
     private final RequestQueue q;
 
     private VolleySingleton(Context c) {
@@ -14,13 +15,11 @@ public class VolleySingleton {
     }
 
     public static synchronized VolleySingleton get(Context c) {
-        if (instance == null)
-            instance = new VolleySingleton(c);
-        return instance;
+        if (inst == null) inst = new VolleySingleton(c);
+        return inst;
     }
 
     public RequestQueue queue() {
         return q;
     }
-
 }

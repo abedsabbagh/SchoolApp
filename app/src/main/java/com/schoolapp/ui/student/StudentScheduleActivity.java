@@ -3,56 +3,47 @@ package com.schoolapp.ui.student;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.gson.JsonObject;
 import com.schoolapp.databinding.ActivityStudentScheduleBinding;
-import com.schoolapp.models.ScheduleItem;
 import com.schoolapp.network.ApiService;
+import com.schoolapp.models.ScheduleItem;
 import com.schoolapp.utils.SessionManager;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StudentScheduleActivity extends AppCompatActivity {
+
     private ActivityStudentScheduleBinding vb;
-    private final List<ScheduleItem> data = new ArrayList<>();
-    private ScheduleAdapter adapter;
+    private final List<ScheduleItem> list = new ArrayList<>();
+    private ScheduleAdapter ad;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
         vb = ActivityStudentScheduleBinding.inflate(getLayoutInflater());
         setContentView(vb.getRoot());
 
-        adapter = new ScheduleAdapter(data);
+        ad = new ScheduleAdapter(list);
         vb.rvSchedule.setLayoutManager(new LinearLayoutManager(this));
-        vb.rvSchedule.setAdapter(adapter);
+        vb.rvSchedule.setAdapter(ad);
 
-        loadData();
-    }
-
-    private void loadData() {
         SessionManager sm = new SessionManager(this);
-        ApiService api = new ApiService(this, sm.token());
+        ApiService api = new ApiService(this, sm.getToken());
 
-        api.getStudentSchedule(sm.uid(), new ApiService.Callback() {
-
+        api.getStudentSchedule(sm.getUid(), new ApiService.Callback() {
             @Override
-            public void onSuccess(JSONObject result) {
-                data.clear();
-
-                JSONArray arr = result.optJSONArray("schedule");
+            public void onSuccess(org.json.JSONObject res) {
+                list.clear();
+                JSONArray arr = res.optJSONArray("schedule");
                 if (arr != null) {
                     for (int i = 0; i < arr.length(); i++) {
-                        JSONObject o = arr.optJSONObject(i);
-                        data.add(new ScheduleItem(
+                        var o = arr.optJSONObject(i);
+                        list.add(new ScheduleItem(
                                 o.optString("subject"),
                                 o.optInt("day"),
                                 o.optString("start"),
@@ -60,17 +51,13 @@ public class StudentScheduleActivity extends AppCompatActivity {
                         ));
                     }
                 }
-                adapter.notifyDataSetChanged();
+                ad.notifyDataSetChanged();
             }
 
             @Override
-            public void onError(String msg) {
-                Toast.makeText(StudentScheduleActivity.this, msg, Toast.LENGTH_SHORT).show();
-
+            public void onError(String e) {
+                Toast.makeText(StudentScheduleActivity.this, e, Toast.LENGTH_SHORT).show();
             }
-
-
         });
     }
 }
-

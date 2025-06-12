@@ -2,37 +2,30 @@ package com.schoolapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.schoolapp.databinding.ActivityMainBinding;
-import com.schoolapp.ui.student.StudentMarksActivity;
-import com.schoolapp.ui.student.StudentScheduleActivity;
-import com.schoolapp.ui.student.SubmitAssignmentActivity;
+import com.schoolapp.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
+
     private ActivityMainBinding vb;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected void onCreate(Bundle s) {
+        super.onCreate(s);
         vb = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(vb.getRoot());
 
-        vb.btnSchedule.setOnClickListener(v ->
-                startActivity(new Intent(this, StudentScheduleActivity.class)));
+        SessionManager sm = new SessionManager(this);
 
-        vb.btnMarks.setOnClickListener(v ->
-                startActivity(new Intent(this, StudentMarksActivity.class)));
-
-        vb.btnSubmit.setOnClickListener(v ->
-                startActivity(new Intent(this, SubmitAssignmentActivity.class)));
-
+        vb.btnLogin.setOnClickListener(v -> {
+            // لأغراض الاختبار فقط نقبل أي شيء وندخل مباشرة
+            sm.saveSession(1, "DUMMY_TOKEN");
+            startActivity(new Intent(this, com.schoolapp.ui.student.StudentActivity.class));
+            finish();
+        });
     }
-
 }

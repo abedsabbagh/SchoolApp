@@ -28,9 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.student.StudentActivity" />
         <activity android:name=".ui.student.StudentScheduleActivity" />
         <activity android:name=".ui.student.StudentMarksActivity" />
         <activity android:name=".ui.student.SubmitAssignmentActivity" />
+
+
     </application>
 
 </manifest>

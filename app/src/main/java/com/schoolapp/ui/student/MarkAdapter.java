@@ -5,41 +5,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONObject;
-
 import com.schoolapp.R;
+import com.schoolapp.models.MarkItem;
 
 import java.util.List;
 
 public class MarkAdapter extends RecyclerView.Adapter<MarkAdapter.Holder> {
-    private final List<JSONObject> marks;
 
-    public MarkAdapter(List<JSONObject> marks) {
-        this.marks = marks;
-    }
+    private final List<MarkItem> list;
 
-    @NonNull
-    @Override
-    public MarkAdapter.Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_mark, parent, false);
-        return new Holder(v);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull MarkAdapter.Holder holder, int position) {
-        JSONObject obj = marks.get(position);
-        holder.tvSubject.setText(obj.optString("subject"));
-        holder.tvType.setText(obj.optString("exam_type"));
-        holder.tvMark.setText(obj.optString("mark"));
-    }
-
-    @Override
-    public int getItemCount() {
-        return marks.size();
+    public MarkAdapter(List<MarkItem> l) {
+        list = l;
     }
 
     public static class Holder extends RecyclerView.ViewHolder {
@@ -50,8 +28,25 @@ public class MarkAdapter extends RecyclerView.Adapter<MarkAdapter.Holder> {
             tvSubject = v.findViewById(R.id.tvSubject);
             tvType = v.findViewById(R.id.tvType);
             tvMark = v.findViewById(R.id.tvMark);
-
         }
+    }
 
+    @Override
+    public Holder onCreateViewHolder(ViewGroup p, int v) {
+        return new Holder(LayoutInflater.from(p.getContext())
+                .inflate(R.layout.item_mark, p, false));
+    }
+
+    @Override
+    public void onBindViewHolder(Holder h, int i) {
+        MarkItem m = list.get(i);
+        h.tvSubject.setText(m.subject);
+        h.tvType.setText(m.type);
+        h.tvMark.setText(m.mark);
+    }
+
+    @Override
+    public int getItemCount() {
+        return list.size();
     }
 }

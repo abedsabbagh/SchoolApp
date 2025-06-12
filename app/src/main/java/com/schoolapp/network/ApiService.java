@@ -7,49 +7,35 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ApiService {
-    private static final String BASE = "https://10.0.2.2/api/";
+
+    public static final String BASE = "http://10.0.2.2/api/";
+
     private final Context ctx;
     private final String token;
 
-    public ApiService(Context ctx, String token) {
-        this.ctx = ctx;
-        this.token = token;
-    }
-
-    public void getStudentMarks(int uid, Object marks) {
+    public ApiService(Context c, String t) {
+        ctx = c;
+        token = t;
     }
 
     public interface Callback {
-        void onSuccess(JSONObject data);
+        void onSuccess(JSONObject obj);
 
         void onError(String msg);
-
     }
 
     public void getStudentSchedule(int uid, Callback cb) {
-        String url = BASE + "Schedule/user/" + uid + ".php";
+        sendGet(BASE + "schedule.php?student_id=" + uid, cb);
+    }
 
-        JsonObjectRequest req = new JsonObjectRequest(
-                Request.Method.GET, url, null,
-                rsp -> {
-                    if (rsp.optBoolean("Success"))
-                        cb.onSuccess(rsp.optJSONObject("data"));
-                    else cb.onError(rsp.optString("message"));
-                },
-                err -> cb.onError(err.toString())
-        ) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> h = new HashMap<>();
-                h.put("Content-Type", "application/json");
-                if (token != null)
-                    h.put("Authorization", "Bearer" + token);
-                return h;
-            }
-        };
+    public void getStudentMarks(int uid, Callback cb) {
+        sendGet(BASE + "marks.php?student_id=" + uid, cb);
+    }
+
+    private void sendGet(String url, Callback cb) {
+        JsonObjectRequest r = new JsonObjectRequest(Request.Method.GET, url, null,
+                cb::onSuccess, e -> cb.onError(e.toString()));
+        VolleySingleton.get(ctx).queue().add(r);
     }
 }

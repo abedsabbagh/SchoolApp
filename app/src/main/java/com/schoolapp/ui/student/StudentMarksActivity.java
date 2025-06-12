@@ -8,18 +8,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.schoolapp.databinding.ActivityStudentMarksBinding;
 import com.schoolapp.network.ApiService;
+import com.schoolapp.models.MarkItem;
 import com.schoolapp.utils.SessionManager;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StudentMarksActivity extends AppCompatActivity {
+
     private ActivityStudentMarksBinding vb;
-    private final List<JSONObject> data = new ArrayList<>();
-    private MarkAdapter adapter;
+    private final List<MarkItem> list = new ArrayList<>();
+    private MarkAdapter ad;
 
     @Override
     protected void onCreate(Bundle s) {
@@ -27,36 +28,35 @@ public class StudentMarksActivity extends AppCompatActivity {
         vb = ActivityStudentMarksBinding.inflate(getLayoutInflater());
         setContentView(vb.getRoot());
 
-        adapter = new MarkAdapter(data);
+        ad = new MarkAdapter(list);
         vb.rvMarks.setLayoutManager(new LinearLayoutManager(this));
-        vb.rvMarks.setAdapter(adapter);
+        vb.rvMarks.setAdapter(ad);
 
-        loadData();
-    }
-
-
-    private void loadData() {
         SessionManager sm = new SessionManager(this);
-        ApiService api = new ApiService(this, sm.token());
+        ApiService api = new ApiService(this, sm.getToken());
 
-        api.getStudentMarks(sm.uid(), new ApiService.Callback() {
+        api.getStudentMarks(sm.getUid(), new ApiService.Callback() {
             @Override
-            public void onSuccess(JSONObject result) {
-                data.clear();
-                JSONArray arr = result.optJSONArray("marks");
+            public void onSuccess(org.json.JSONObject res) {
+                list.clear();
+                JSONArray arr = res.optJSONArray("marks");
                 if (arr != null) {
                     for (int i = 0; i < arr.length(); i++) {
-                        data.add(arr.optJSONObject(i));
+                        var o = arr.optJSONObject(i);
+                        list.add(new MarkItem(
+                                o.optString("subject"),
+                                o.optString("exam_type"),
+                                o.optString("mark")
+                        ));
                     }
                 }
-                adapter.notifyDataSetChanged();
+                ad.notifyDataSetChanged();
             }
 
             @Override
-            public void onError(String msg) {
-                Toast.makeText(StudentMarksActivity.this, msg, Toast.LENGTH_SHORT).show();
+            public void onError(String e) {
+                Toast.makeText(StudentMarksActivity.this, e, Toast.LENGTH_SHORT).show();
             }
         });
     }
 }
-
